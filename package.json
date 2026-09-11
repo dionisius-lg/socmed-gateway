@@ -1,0 +1,41 @@
+{
+    "name": "socmed-gateway",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev-win": "set NODE_ENV=development&& nodemon app.js",
+        "prod-win": "set NODE_ENV=production&& nodemon app.js",
+        "dev": "NODE_ENV=development pm2 start app.js --name socmed-gateway --log-date-format 'YYYY-MM-DD HH:mm:ss Z'",
+        "prod": "NODE_ENV=production pm2 start app.js --name socmed-gateway --log-date-format 'YYYY-MM-DD HH:mm:ss Z'",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write ."
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "amqplib": "^2.0.1",
+        "axios": "^1.20.0",
+        "compression": "^1.8.1",
+        "dayjs": "^1.11.23",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "joi": "^17.13.6",
+        "joi-phone-number": "^5.1.1",
+        "morgan": "^1.11.0",
+        "rotating-file-stream": "^3.2.10",
+        "swagger-ui-express": "^5.0.1",
+        "winston": "^3.19.0",
+        "winston-daily-rotate-file": "^5.0.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.9.1",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.6",
+        "globals": "^17.11.0",
+        "prettier": "^3.9.6"
+    }
+}
