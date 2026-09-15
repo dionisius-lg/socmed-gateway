@@ -66,46 +66,61 @@ const sleep = (milliseconds = 0) => {
  * @returns {any} Parsed JSON or original value
  */
 const safeJsonParse = (value, { maxDepth = 3, maxStringLength = 1048576 } = {}) => {
-    const limitDepth = Number.isInteger(maxDepth) && maxDepth >= 0 ? maxDepth : 3;
-    const limitLength = Number.isInteger(maxStringLength) && maxStringLength > 0 ? maxStringLength : 1024 * 1024; // 1 MB
+	const limitDepth = Number.isInteger(maxDepth) && maxDepth >= 0 ? maxDepth : 3;
+	const limitLength = Number.isInteger(maxStringLength) && maxStringLength > 0 ? maxStringLength : 1024 * 1024; // 1 MB
 
-    const parse = (input, depth) => {
-        if (depth > limitDepth) {
-            return input;
-        }
+	const safeParse = (input, depth) => {
+		if (depth > limitDepth) {
+			return input;
+		}
 
-        if (input === null || input === undefined) {
-            return input;
-        }
+		if (input === null || input === undefined) {
+			return input;
+		}
 
-        if (typeof input === 'object') {
-            return input;
-        }
+		// Recursive object
+		if (typeof input === 'object') {
+			if (Array.isArray(input)) {
+				return input.map(item => safeParse(item, depth + 1));
+			}
 
-        if (typeof input !== 'string') {
-            return input;
-        }
+			const result = {};
 
-        if (input.length > limitLength) {
-            return input;
-        }
+			for (const [key, value] of Object.entries(input)) {
+				result[key] = safeParse(value, depth + 1);
+			}
 
-        const trimmed = input.trim();
+			return result;
+		}
 
-        if (!trimmed) {
-            return input;
-        }
+		if (typeof input !== 'string') {
+			return input;
+		}
 
-        try {
-            const parsed = JSON.parse(trimmed);
+		if (input.length > limitLength) {
+			return input;
+		}
 
-            return typeof parsed === 'string' && parsed !== trimmed ? parse(parsed, depth + 1) : parsed;
-        } catch {
-            return input;
-        }
-    };
+		const trimmed = input.trim();
 
-    return parse(value, 0);
+		if (!trimmed) {
+			return input;
+		}
+
+		try {
+			const parsed = JSON.parse(trimmed);
+
+			if (parsed === trimmed) {
+				return parsed;
+			}
+
+			return safeParse(parsed, depth + 1);
+		} catch {
+			return input;
+		}
+	}
+
+	return safeParse(value, 0);
 };
 
 /**
