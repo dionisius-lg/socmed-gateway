@@ -89,6 +89,18 @@ exports.handleChanges = async (req, res) => {
             eventName = 'post';
         } else if (isComment) {
             eventName = 'comment';
+
+            if (entryValue?.post?.permalink_url) {
+                const url = new URL(entryValue.post.permalink_url);
+                const isPermalink = url.pathname === '/permalink.php';
+                const hasStoryId = url.searchParams.has('story_fbid');
+                const hasPostId = url.searchParams.has('id');
+
+                if (entry?.id && isPermalink && hasStoryId && !hasPostId) {
+                    url.searchParams.set('id', entry.id);
+                    entryValue.post.permalink_url = url.toString();
+                }
+            }
         }
 
         const webhookData = {
